@@ -23,7 +23,7 @@ A backend REST API for a social recipe sharing platform built with Django REST F
 
 - **Role-based access control** — Sellers create and manage recipes; Customers view and rate them
 - **JWT authentication** — secure token-based auth with access/refresh token flow
-- **Rate limiting** — throttling applied globally (100/day anonymous, 1000/day authenticated)
+- **Rate limiting** — throttling applied globally (100/day anonymous, 1000/day authenticated) and 5/minute for login
 - **Async image compression** — recipe images are compressed in the background via Celery without blocking the API response
 - **Daily email notifications** — scheduled at 6 AM IST, Monday to Friday only
 - **Weekly S3 export** — all user data exported as CSV to Amazon S3 every Monday
