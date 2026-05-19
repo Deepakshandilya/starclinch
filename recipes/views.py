@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Recipe, Rating
 from .serializers import RecipeSerializer, RecipeWriteSerializer, RatingSerializer
 from users.permissions import IsSeller, IsCustomer
-
+from .tasks import compress_recipe_image
 
 class RecipeListCreateView(APIView):
 
@@ -24,8 +24,10 @@ class RecipeListCreateView(APIView):
     def post(self, request):
         serializer = RecipeWriteSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(seller=request.user)  # attach logged in seller
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            recipe = serializer.save(seller=request.user)
+            # fire async task 
+            compress_recipe_image.delay(str(recipe.image))
+            return Response(RecipeSerializer(recipe).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,7 +22,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 
-from decouple import config
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'rest_framework_simplejwt',
+    'django_celery_beat',
 
     'users',
     'recipes',
@@ -110,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -148,3 +150,41 @@ import os
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+# Celery
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Asia/Kolkata'
+
+CELERY_BEAT_SCHEDULE = {
+    'daily-email': {
+        'task': 'recipes.tasks.send_daily_email',
+        'schedule': crontab(hour=6, minute=0, day_of_week='1-5'),  # Mon-Fri only
+    },
+    'weekly-s3-export': {
+        'task': 'recipes.tasks.export_users_to_s3',
+        'schedule': crontab(hour=0, minute=0, day_of_week='1'),  # Every Monday midnight
+    },
+}
+
+
+# Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+
+# AWS S3
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID', default='')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY', default='')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME', default='')
+AWS_S3_REGION_NAME = config('AWS_S3_REGION_NAME', default='ap-south-1')
+
+
+
+
