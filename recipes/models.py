@@ -29,10 +29,9 @@ class Recipe(models.Model):
         return self.name
 
     def average_rating(self):
-        ratings = self.ratings.all()
-        if not ratings:
-            return 0
-        return round(sum(r.score for r in ratings) / len(ratings), 2)
+        from django.db.models import Avg
+        result = self.ratings.aggregate(Avg('score'))
+        return round(result['score__avg'] or 0, 2)
 
 
 class Rating(models.Model):
