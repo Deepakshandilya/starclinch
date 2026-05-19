@@ -107,6 +107,13 @@ AWS_STORAGE_BUCKET_NAME=your-bucket-name
 docker compose up --build
 ```
 
+### 4. Create an admin superuser (optional — for /admin panel)
+
+```bash
+docker compose exec django python manage.py createsuperuser
+```
+
+
 This starts 4 containers:
 
 | Container | Role |
@@ -119,6 +126,40 @@ This starts 4 containers:
 The API is available at `http://localhost:8000`
 
 ---
+## Docker Commands
+
+```bash
+# Start the entire stack
+docker compose up --build
+
+# Stop all containers
+docker compose down
+
+# Start all containers
+docker compose up
+```
+
+## Manually Triggering Celery Tasks
+
+Useful for testing without waiting for the schedule.
+
+```bash
+# Open Django shell inside the container
+docker compose exec django python manage.py shell
+
+# Then run:
+from recipes.tasks import send_daily_email, export_users_to_s3
+
+# Trigger daily email
+send_daily_email.delay()
+
+# Trigger S3 export
+export_users_to_s3.delay()
+```
+
+You can verify the email arrived in your inbox and check your S3 bucket for the
+timestamped CSV file under the `exports/` prefix.
+
 
 ## API Reference
 
