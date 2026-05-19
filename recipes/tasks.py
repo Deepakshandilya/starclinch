@@ -1,8 +1,9 @@
 from celery import shared_task
-from celery.schedules import crontab
 from PIL import Image
+from datetime import datetime
 from django.core.mail import send_mail
 from django.conf import settings
+from .models import Recipe
 import boto3
 import csv
 import os
@@ -31,9 +32,19 @@ def compress_recipe_image(image_path):
 @shared_task
 def send_daily_email():
     """Send daily notification email — skips weekends via crontab schedule."""
+
+    latest_recipes = Recipe.objects.order_by('-created_at')[:5]
+    recipe_names = "\n".join(recipe.name for recipe in latest_recipes)
+    message = f"""Today's latest recipes:
+
+    {recipe_names}
+
+    Visit StarClinch to explore more recipes.
+    """
+
     send_mail(
         subject='StarClinch — Daily Recipe Update',
-        message='Check out the latest recipes added to the platform today!',
+        message=message,
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[settings.EMAIL_HOST_USER], 
         fail_silently=False,
@@ -62,9 +73,11 @@ def export_users_to_s3():
         region_name=settings.AWS_S3_REGION_NAME,
     )
 
+    filename = f"exports/users_{datetime.now().strftime('%Y_%m_%d')}.csv"
+
     s3.put_object(
         Bucket=settings.AWS_STORAGE_BUCKET_NAME,
-        Key='exports/users.csv',
+        Key=filename,
         Body=buffer.getvalue(),
         ContentType='text/csv',
     )
