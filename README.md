@@ -184,6 +184,15 @@ timestamped CSV file under the `exports/` prefix.
 | POST | `/api/recipes/{id}/rate/` | Customer only | Rate a recipe (1–5, once per recipe) |
 
 ---
+## Postman Collection
+
+Import both files into Postman to test all endpoints:
+
+1. `StarClinch API.postman_collection.json` — all API requests with auto token handling
+2. `StarClinch.postman_environment.json` — environment variables (base_url, tokens)
+
+Run requests top to bottom in order. Tokens are saved automatically after login.
+
 
 ## Example Requests
 

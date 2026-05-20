@@ -1,0 +1,532 @@
+{
+  "info": {
+    "_postman_id": "ed0a89da-2470-46d4-a837-acf0e036d99c",
+    "name": "StarClinch API",
+    "description": "This collection covers the core REST API endpoints for the **StarClinch** platform, which supports two distinct user roles — **Sellers** and **Customers** — along with a **Recipe** management system.\n\n### Authentication\n\nHandles account registration, login, profile retrieval, and account deletion for both Sellers and Customers. Token-based authentication is used, with tokens stored in the `seller_token` and `customer_token` environment variables for reuse across requests.\n\n- Register Seller / Register Customer\n    \n- Login Seller / Login Customer\n    \n- Get Profile (Seller)\n    \n- Delete Seller Account / Delete Customer Account\n    \n\n### Recipes\n\nSellers can create, update, and delete recipes. Both Sellers and Customers can browse and view individual recipes. Customers can also rate recipes.\n\n- Add Recipe\n    \n- Get All Recipes\n    \n- Get Single Recipe\n    \n- Update Recipe\n    \n- Delete Recipe (Seller)\n    \n- Rate Recipe\n    \n\n### Environment Variables\n\nThe collection relies on the following environment variables:\n\n- `base_url` — Base URL of the API server\n    \n- `seller_token` — Auth token for Seller requests\n    \n- `customer_token` — Auth token for Customer requests\n    \n- `recipe_id` — ID of the recipe used in single-recipe and rating operations",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48145409",
+    "_collection_link": "https://go.postman.co/collection/48145409-ed0a89da-2470-46d4-a837-acf0e036d99c?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Register Seller",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"chef_deepak\",\r\n    \"email\": \"chef@example.com\",\r\n    \"password\": \"pass1234\",\r\n    \"role\": \"seller\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/register/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login Seller",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();\r",
+              "pm.environment.set(\"seller_token\", res.access);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"chef_deepak\",\r\n    \"password\": \"pass1234\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/login/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Add Recipe",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();\r",
+              "pm.environment.set(\"recipe_id\", res.id);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{seller_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "name",
+              "value": "Aloo Paratha",
+              "type": "text",
+              "uuid": "8f0d3c7e-54dd-4b9e-82cf-9a852dae7d07"
+            },
+            {
+              "key": "description",
+              "value": "Aloo Paratha is a popular Punjabi breakfast made with unleavened whole wheat flatbread stuffed with a spiced mashed potato filling. The paratha is rolled out and cooked on a tawa with oil or ghee until crisp. It is traditionally served with curd, mango pickle, or butter.",
+              "type": "text",
+              "uuid": "be8208d7-5295-4ce4-8e44-c80b4a16a462"
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "uuid": "ca65320d-4ded-41b5-a860-1d2f8d3278a4",
+              "src": "postman-cloud:///1f153d4c-244f-4fb0-b865-0af0cd9efec3"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/recipes/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recipes",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get All Recipes",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/recipes/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recipes",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Recipe",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/recipes/{{recipe_id}}/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recipes",
+            "{{recipe_id}}",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Recipe",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{seller_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "PATCH",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"description\": \"Delicious Dish to eat !! no description needed\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/recipes/{{recipe_id}}/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recipes",
+            "{{recipe_id}}",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Single Recipe Copy",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/recipes/{{recipe_id}}/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recipes",
+            "{{recipe_id}}",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Register Customer",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"foodlover\",\r\n    \"email\": \"customer@example.com\",\r\n    \"password\": \"pass1234\",\r\n    \"role\": \"customer\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/register/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Login Customer",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "const res = pm.response.json();\r",
+              "pm.environment.set(\"customer_token\", res.access);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"foodlover\",\r\n    \"password\": \"pass1234\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/auth/login/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Rate Recipe",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{customer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"score\": 5,\r\n    \"review\": \"Absolutely amazing recipe!\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{base_url}}/api/recipes/{{recipe_id}}/rate/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recipes",
+            "{{recipe_id}}",
+            "rate",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get Profile (Seller)",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{seller_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/auth/profile/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "profile",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Recipe (Seller)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 204\", () => pm.response.to.have.status(204));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{seller_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/recipes/{{recipe_id}}/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "recipes",
+            "{{recipe_id}}",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Seller Account",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 204\", () => pm.response.to.have.status(204));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{seller_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/auth/profile/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "profile",
+            ""
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Customer Account",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status is 204\", () => pm.response.to.have.status(204));"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{customer_token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/auth/profile/",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "profile",
+            ""
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
