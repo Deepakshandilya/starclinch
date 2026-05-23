@@ -1,4 +1,4 @@
-# StarClinch — Recipe Sharing Platform API
+# Recipe Sharing Platform API
 
 A backend REST API for a social recipe sharing platform built with Django REST Framework. Supports two user roles — **Sellers** who publish recipes, and **Customers** who browse and rate them. Includes asynchronous image processing via Celery, scheduled email notifications, and weekly data exports to Amazon S3.
 
